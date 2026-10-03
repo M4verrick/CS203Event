@@ -42,10 +42,10 @@ jobs:
       run:  mvn test
     
     - name: Test Report
-      uses: dorny/test-reporter@v1
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       if: success() || failure()
       with:
-        name: Unit Test Report
+        name: unit-test-reports-${{ github.run_id }}
         path: target/surefire-reports/*.xml
-        reporter: java-junit
-        fail-on-error: true
+        if-no-files-found: error
+        retention-days: 7
