@@ -11,10 +11,16 @@ name: Build
 on:
   push:
     branches: 
+      - 'main'
       - 'development'
   pull_request:
     branches: 
+      - 'main'
       - 'development' 
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -26,7 +32,7 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -36,10 +42,10 @@ jobs:
       run:  mvn test
     
     - name: Test Report
-      uses: dorny/test-reporter@v1
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       if: success() || failure()
       with:
-        name: Unit Test Report
+        name: unit-test-reports-${{ github.run_id }}
         path: target/surefire-reports/*.xml
-        reporter: java-junit
-        fail-on-error: true
+        if-no-files-found: error
+        retention-days: 7
